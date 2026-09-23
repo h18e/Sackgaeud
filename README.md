@@ -59,4 +59,5 @@ und das Theme –, liegt deshalb dort; SwiftData wird darin bewusst nicht import
 python3 tools/verify_structure.py
 ```
 
-Ersetzt keinen Compiler. Den Build-Nachweis liefert Xcode (⌘B, Tests mit ⌘U).
+Ersetzt keinen Compiler. Den Build-Nachweis liefert Xcode (⌘B, Tests mit ⌘U) –
+oder im Terminal `tools/run.sh test` bzw. `tools/run.sh sim` (siehe SETUP.md).

@@ -64,6 +64,10 @@ cat ~/Developer/Frostify/Config/Signing.local.xcconfig   # zeigt den Inhalt an
 > Achtung: Die Variable heisst hier `SACKGAEUD_DEVELOPMENT_TEAM`, nicht
 > `FROSTIFY_…`. Nur die zehn Zeichen dahinter übernehmen.
 
+> **Lieber alles im Terminal?** Nach Schritt 2 gibt es den Abschnitt
+> [Terminal-Weg](#terminal-weg) weiter unten. Er ersetzt die Schritte 3 bis 9;
+> nur die Anmeldung in Xcode bleibt ein einmaliger Klick.
+
 ---
 
 ## 3. Projekt in Xcode öffnen
@@ -240,6 +244,31 @@ inklusive der Zeile mit `Thread 1:` oder `Fatal error:`.
 | Im Simulator lässt sich nichts eintippen | Die Bildschirmtastatur des Simulators ist aus: **I/O → Keyboard → Toggle Software Keyboard** (⌘K) |
 | Face ID im Simulator | **Features → Face ID → Enrolled** anhaken, dann beim Dialog **Features → Face ID → Matching Face** |
 | `The file "Sackgaeud.xcodeproj" couldn't be opened` | Xcode zu alt – es braucht Xcode 26 oder neuer |
+
+---
+
+## Terminal-Weg
+
+Alles ausser der Anmeldung in Xcode geht im Terminal. Das Skript `tools/run.sh`
+nimmt dir die langen `xcodebuild`-Befehle ab.
+
+**Einmalig in Xcode:** **Xcode → Settings…** (⌘ + ,) → **Accounts** → deine Apple-ID
+muss dort stehen (bei dir schon der Fall, wegen Frostify). Nur fürs iPhone nötig,
+nicht für den Simulator.
+
+```bash
+cd ~/Developer/Sackgaeud
+tools/run.sh test          # Tests (entspricht ⌘U)
+tools/run.sh sim           # bauen, Simulator öffnen, App starten (entspricht ⌘R)
+tools/run.sh device        # zeigt die angeschlossenen iPhones mit ihrer ID
+tools/run.sh device <ID>   # aufs iPhone installieren und starten
+```
+
+Bei einem Fehler zeigt das Skript nur die Fehlerzeilen – genau die schickst du mir.
+
+Beim iPhone legt `tools/run.sh device` App-ID, App Group und iCloud-Container im
+Entwicklerportal selbst an. Meldet es trotzdem etwas mit `application-groups` oder
+`iCloud`, einmal Schritt 4 und 5 in Xcode durchklicken.
 
 ---
 
