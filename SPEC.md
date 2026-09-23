@@ -1,6 +1,6 @@
 # Sackgäud – Spezifikation (Phase 1)
 
-**Stand:** 2026-09-23 · **Status:** Entwurf zum Gegenlesen · **Autor:** Claude Code für Raphi
+**Stand:** 2026-09-23 · **Status:** freigegeben und umgesetzt (siehe README.md, SETUP.md) · **Autor:** Claude Code für Raphi
 
 Native iOS-App, die eine einzige Frage beantwortet: **Wie viel darf ich bis zum
 nächsten 25. noch ausgeben?** Fixkosten, Einnahmen und Konten verwaltet sie bewusst
@@ -42,17 +42,16 @@ Diese Regeln liegen als reine Funktionen in der Domain-Schicht und bekommen Test
   endet vor dem nächsten 25. um 00:00.
 - Bezeichnet wird sie nach dem Monat, in dem sie **endet** – so wie der Lohn vom
   25. September „der Oktoberlohn" ist: 25.09.–24.10. heisst **„Oktober 2026"**.
-  *(Bitte prüfen, siehe 9.)*
 - Zu welcher Periode eine Buchung gehört, bestimmt allein ihr Datum.
 
 ### 2.2 Periodenbetrag
 
 - Der Betrag aus den Einstellungen gilt **ab sofort für die laufende Periode**.
 - Vergangene Perioden behalten den Betrag, der zu ihrer Zeit galt.
-- Umsetzung: Jede Änderung wird als `BudgetAmount` mit dem Startdatum der laufenden
+- Umsetzung: Jede Änderung wird als `BudgetAmount` mit dem Schlüssel der laufenden
   Periode gespeichert (mehrere Änderungen in derselben Periode überschreiben
-  einander). Der Betrag einer Periode ist der jüngste Eintrag, dessen Startdatum
-  nicht nach dem Periodenstart liegt. Für Perioden vor dem ersten Eintrag (rückdatierte
+  einander). Der Betrag einer Periode ist der jüngste Eintrag, dessen Periode
+  nicht nach der gesuchten liegt. Für Perioden vor dem ersten Eintrag (rückdatierte
   Buchungen) gilt der erste Eintrag.
 
 ### 2.3 Restbetrag und Tagesbudget
@@ -102,7 +101,7 @@ Beziehungen optional.
 | id | UUID | Startset mit **festen UUIDs**, siehe unten |
 | name | String | |
 | symbol | String | SF-Symbol-Name |
-| colorKey | String | Schlüssel in die feste Farbpalette des Themes |
+| colorIndex | Int | Platz in der festen Farbpalette des Themes |
 | sortOrder | Int | Reihenfolge im Erfassen-Dialog |
 | isFallback | Bool | true nur für „Diverses" |
 | expenses | [Expense]? | 1:n, Löschregel *nullify* |
@@ -130,20 +129,20 @@ löschen). Ohne sie gäbe es jede Kategorie zweimal.
 
 | Feld | Typ | Bemerkung |
 |---|---|---|
-| periodStart | Date | 25. des Monats, 00:00 |
+| periodKey | Int | Jahr und Monat des Periodenbeginns, z. B. 202609 – eine Zahl statt eines Datums, damit zwei Geräte in verschiedenen Zeitzonen dieselbe Periode meinen |
 | amountRappen | Int | |
 | updatedAt | Date | |
 
-Treffen nach dem Sync zwei Einträge mit gleichem `periodStart` aufeinander, gilt der
+Treffen nach dem Sync zwei Einträge mit gleichem `periodKey` aufeinander, gilt der
 mit dem jüngeren `updatedAt`.
 
 ### 3.4 Nicht synchronisiert (pro Gerät, `UserDefaults`)
 
 - zuletzt benutzte Kategorie (Vorauswahl beim Erfassen)
 - Face-ID-Sperre an/aus
-- Einstieg abgeschlossen ja/nein (wird zusätzlich als erledigt betrachtet, sobald
-  per Sync ein `BudgetAmount` eintrifft – auf dem zweiten Gerät fragt die App also
-  nicht nochmals nach dem Betrag)
+- Ein eigenes Merkmal „Einstieg abgeschlossen" braucht es nicht: Der Einstieg
+  erscheint, solange es keinen `BudgetAmount` gibt. Trifft auf einem zweiten Gerät
+  der Betrag per Sync ein, wechselt die App von selbst zum Hauptbildschirm.
 
 ---
 
@@ -193,7 +192,7 @@ Ziel: **unter 5 Sekunden** vom Antippen bis zum Sichern.
   „− CHF 35.– überzoge" rot mit Pfeil).
 - Antippen → Periodendetail:
   - Betrag, Ausgaben, Ergebnis
-  - **Balken je Kategorie** (Swift Charts), absteigend nach Summe, mit Betrag und Anteil
+  - **Balken je Kategorie**, absteigend nach Summe, mit Betrag und Anteil
   - alle Buchungen der Periode, bearbeitbar wie auf dem Hauptbildschirm
 
 ### 4.5 Einstellungen
@@ -231,8 +230,8 @@ Ziel: **unter 5 Sekunden** vom Antippen bis zum Sichern.
 |---|---|---|
 | UI | SwiftUI, **iOS 26+** | wie Frostify |
 | Persistenz & Sync | **SwiftData** mit `cloudKitDatabase: .private(…)` | siehe unten |
-| Diagramme | Swift Charts | Apple-eigen |
-| Widget | WidgetKit, Datenzugriff über **App Group** | Widget und App lesen dieselbe Datenbank |
+| Balken | eigene SwiftUI-Ansicht, wie in Frostify | im Dark Mode exakt kontrollierbar, kein Chart-Framework nötig |
+| Widget | WidgetKit, **Schnappschuss** in der App Group | siehe 6.2 |
 | Sperre | LocalAuthentication | |
 | Tests | Swift Testing | Perioden-, Betrags- und Rundungslogik |
 | Abhängigkeiten | **keine externen Pakete** | wie Frostify |
@@ -242,8 +241,8 @@ Ziel: **unter 5 Sekunden** vom Antippen bis zum Sichern.
 Bei Frostify war CloudKit **Sharing zwischen zwei Apple-IDs** der Grund für Core Data –
 genau dort ist SwiftData schwach. Sackgäud teilt nichts; es braucht nur den
 Abgleich der privaten Datenbank zwischen Raphis eigenen Geräten. Das deckt SwiftData
-direkt ab, mit deutlich weniger Rahmen-Code. Auch hier liegt die Persistenz hinter
-einem eigenen Protokoll, ein Wechsel bliebe also möglich.
+direkt ab, mit deutlich weniger Rahmen-Code. Alle schreibenden Zugriffe liegen
+in `BudgetRepository`, ein Wechsel bliebe also auf eine Stelle beschränkt.
 
 ---
 
@@ -252,36 +251,24 @@ einem eigenen Protokoll, ein Wechsel bliebe also möglich.
 ### 6.1 Ordnerstruktur
 
 ```
-Sackgaeud/
-├── App/
-│   ├── SackgaeudApp.swift         # Einstieg, ModelContainer, Sperre
-│   └── RootView.swift             # Einstieg oder Hauptbildschirm
-├── Model/                         # SwiftData-Modelle
-│   ├── Expense.swift
-│   ├── Category.swift
-│   ├── BudgetAmount.swift
-│   └── CategorySeed.swift         # Startset mit festen UUIDs, Zusammenführen von Doppeln
-├── Domain/                        # reine Logik, ohne SwiftData, voll testbar
-│   ├── BudgetPeriod.swift         # Periode aus Datum, Name, verbleibende Tage
-│   ├── BudgetMath.swift           # Rest, Tagesbudget, Ergebnis, Periodenbetrag
-│   └── MoneyFormat.swift          # Rappen ↔ Eingabe, 5-Rappen-Rundung, Anzeige
+Sackgaeud/                         # nur App
+├── App/                           # Einstieg, Wurzelansicht, Sperrbildschirm
+├── Model/                         # Expense, SpendingCategory, BudgetAmount, Startset
 ├── Persistence/
-│   ├── ModelContainerFactory.swift  # App Group, CloudKit-Konfiguration
-│   └── BudgetRepository.swift       # Protokoll + SwiftData-Umsetzung
-├── Features/
-│   ├── Onboarding/
-│   ├── Overview/                  # Hauptbildschirm
-│   ├── ExpenseEditor/             # Erfassen und Bearbeiten
-│   ├── History/                   # Perioden und Periodendetail
-│   ├── Settings/                  # Betrag, Kategorien, Face ID
-│   └── Shared/                    # Theme, Komponenten
-├── Services/
-│   └── AppLock.swift              # Face-ID-Sperre
+│   ├── ModelContainerFactory.swift  # iCloud-Konfiguration, lokaler Rückfall
+│   └── BudgetRepository.swift       # alle schreibenden Zugriffe
+├── Services/                      # Face-ID-Sperre, Rückgängig, Widget-Schnappschuss
+├── Features/                      # Onboarding, Overview, ExpenseEditor, History, Settings, Shared
 └── Resources/
-    └── Assets.xcassets
+Shared/                            # App und Widget
+├── Domain/                        # BudgetPeriod, BudgetMath, MoneyFormat, WidgetSnapshot
+└── Design/                        # Theme
 SackgaeudWidget/                   # Widget-Erweiterung
 SackgaeudTests/
 ```
+
+Die Kategorie heisst im Code `SpendingCategory`, weil die Objective-C-Laufzeit
+den Namen `Category` bereits belegt.
 
 ### 6.2 Schichtenregel
 
@@ -290,8 +277,12 @@ SackgaeudTests/
 - **Domain** kennt SwiftData nicht. Alle Rechenregeln aus Kapitel 2 liegen dort und
   werden getestet, insbesondere die Randfälle: 24./25. um Mitternacht, Jahreswechsel,
   Periode über den Februar, Buchung am letzten Tag, Rest genau 0, Überzug.
-- **Persistence** kapselt SwiftData hinter `BudgetRepository`; das Widget nutzt
-  dieselbe Umsetzung.
+- **Persistence:** Geschrieben wird nur über `BudgetRepository`.
+- **Widget:** Es öffnet die Datenbank **nicht**. Die App legt nach jeder Änderung
+  einen Schnappschuss (Periode, Betrag, Ausgaben, Betrag aus den Einstellungen) in
+  die App Group; daraus rechnet das Widget Rest und Tagesbudget für jeden Zeitpunkt
+  selbst aus, auch über Mitternacht und den 25. hinweg. So laufen nie zwei Prozesse
+  gegen denselben iCloud-gespiegelten Speicher.
 
 ### 6.3 Gestaltung und Sprache
 
@@ -331,10 +322,10 @@ SackgaeudTests/
 
 ---
 
-## 9. Von mir gesetzte Details – bitte prüfen
+## 9. Von mir gesetzte Details – bestätigt
 
-Diese Punkte waren im Gespräch nicht ausdrücklich Thema. Ich habe sie so festgelegt,
-wie es mir am sinnvollsten scheint; ein Wort genügt, um sie zu ändern.
+Diese Punkte waren im Gespräch nicht ausdrücklich Thema und wurden mit der
+Freigabe so bestätigt.
 
 | # | Punkt | Vorschlag |
 |---|---|---|
@@ -360,10 +351,9 @@ kommt Schritt für Schritt ins `SETUP.md`.
 
 ---
 
-## 11. Freigabe
+## 11. Umsetzung
 
-Mit „Freigabe", „Umsetzen" oder „Starte jetzt" beginne ich mit Phase 2.
-Reihenfolge:
+Freigegeben am 23.09.2026, umgesetzt in dieser Reihenfolge:
 
 1. Xcode-Projekt, Modelle, Domain-Logik + Tests
 2. Einstieg, Hauptbildschirm, Erfassen/Bearbeiten
@@ -371,3 +361,5 @@ Reihenfolge:
 4. iCloud-Sync, Face-ID-Sperre
 5. Widget
 6. `README.md`, `SETUP.md`, `RELEASE.md`, `PRIVACY.md`, `TEXTE.md`
+
+Nächster Schritt: Build und Test in Xcode (SETUP.md).

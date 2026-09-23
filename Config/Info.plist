@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+		Nur die Schlüssel, die Xcode nicht selber generiert.
+		Alles Übrige (Name, Version, Face-ID-Text …) kommt aus
+		GENERATE_INFOPLIST_FILE = YES und den INFOPLIST_KEY_*-Einstellungen.
+
+		Für UIBackgroundModes gibt es keine INFOPLIST_KEY_*-Entsprechung. Wer das
+		trotzdem als Build-Einstellung schreibt, bekommt keinen Fehler – der
+		Schlüssel fehlt am Ende einfach in der App.
+	-->
+
+	<!-- iCloud meldet Änderungen vom anderen Gerät über stille Push-Nachrichten;
+	     dafür braucht die App den Hintergrundmodus "remote-notification". -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
+
+	<!-- Dark Mode ist das einzige Erscheinungsbild der App. -->
+	<key>UIUserInterfaceStyle</key>
+	<string>Dark</string>
+
+	<!-- Nur die Verschlüsselung, die Apple selbst mitbringt (iCloud-Transport).
+	     Ohne diesen Schlüssel fragt App Store Connect bei jedem Build danach. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+</dict>
+</plist>

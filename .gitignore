@@ -1,0 +1,30 @@
+# macOS
+.DS_Store
+
+# Xcode – Benutzer- und Build-Daten
+xcuserdata/
+*.xcuserstate
+build/
+DerivedData/
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Persoenliche Signierungs-Einstellungen (siehe Config/Signing.local.xcconfig.example).
+# Bewusst NICHT im Git: sonst kollidiert jeder "git pull" mit lokalen Aenderungen.
+Config/Signing.local.xcconfig
+
+# String Catalog: Xcode fuellt diese Datei bei jedem Bauen mit den aus dem Code
+# gezogenen Texten – eine abgeleitete Datei, die bei jedem "git pull" kollidieren
+# wuerde. Sackgaeud ist einsprachig, die Texte stehen direkt im Swift-Code.
+# Sobald eine zweite Sprache dazukommt: Zeile entfernen, Datei ins Git aufnehmen.
+Sackgaeud/Resources/Localizable.xcstrings
+
+# Swift Package Manager
+.swiftpm/
+.build/
+
+# Python
+__pycache__/
