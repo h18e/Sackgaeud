@@ -44,6 +44,8 @@ struct ExpenseSections: View {
                         } label: {
                             Label("Lösche", systemImage: "trash")
                         }
+                        // Ohne eigene Farbe übernähme die Wischaktion das Grün der App.
+                        .tint(Theme.negative)
                     }
                 }
             } header: {

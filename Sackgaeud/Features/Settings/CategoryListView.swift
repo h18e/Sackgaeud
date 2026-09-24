@@ -37,6 +37,7 @@ struct CategoryListView: View {
                             } label: {
                                 Label("Lösche", systemImage: "trash")
                             }
+                            .tint(Theme.negative)
                         }
                     }
                 }
@@ -135,7 +136,8 @@ struct CategoryEditorView: View {
         "figure.hiking", "figure.run", "bicycle", "ticket", "music.note", "film",
         "tram", "car", "fuelpump", "airplane", "house", "wrench.and.screwdriver",
         "cross.case", "pills", "scissors", "pawprint", "leaf", "heart",
-        "graduationcap", "iphone", "creditcard", "banknote", "sparkles", "ellipsis.circle"
+        "graduationcap", "iphone", "laptopcomputer", "headphones", "popcorn", "paintpalette",
+        "creditcard", "banknote", "sparkles", "ellipsis.circle"
     ]
 
     private var trimmedName: String {

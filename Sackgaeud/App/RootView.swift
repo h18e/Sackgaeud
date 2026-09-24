@@ -58,6 +58,7 @@ struct RootView: View {
     private func tidyUp() {
         guard !amounts.isEmpty else { return }
         CategorySeed.seedIfNeeded(in: context)
+        CategorySeed.migrateLegacyTemplates(in: context)
         CategorySeed.mergeDuplicates(in: context)
     }
 }

@@ -11,10 +11,10 @@ Wenn dir öppis nid passt: säg mer d Zile, i ändere's.
 
 `Sackgaeud/App/RootView.swift`
 
-- Zile 75: **\(MoneyFormat.chf(deleted.amountRappen)) glöscht**
-- Zile 79: **Rückgängig**
-- Zile 104: **Sackgäud isch gsperrt**
-- Zile 108: **Entsperre**
+- Zile 76: **\(MoneyFormat.chf(deleted.amountRappen)) glöscht**
+- Zile 80: **Rückgängig**
+- Zile 105: **Sackgäud isch gsperrt**
+- Zile 109: **Entsperre**
 
 ## Erschte Start
 
@@ -107,19 +107,19 @@ Wenn dir öppis nid passt: säg mer d Zile, i ändere's.
 
 - Zile 28: **Cha nid glöscht wärde**
 - Zile 38: **Lösche**
-- Zile 45: **„Diverses“ cha nid glöscht wärde: Dert lande d Buechige vo glöschte Kategorie.**
-- Zile 62: **Neui Kategorie**
-- Zile 81: **Abbräche**
-- Zile 95: **Die Kategorie het keni Buechige.**
-- Zile 96: **1 Buechig chunnt nach „Diverses“.**
-- Zile 97: **\(category.expenseCount) Buechige chöme nach „Diverses“.**
-- Zile 148: **Name**
-- Zile 149: **z. B. Gschänk**
-- Zile 154: **Farb**
-- Zile 169: **Farb \(index + 1)**
-- Zile 177: **Symbol**
-- Zile 202: **Kategorie bearbeite**
-- Zile 209: **Sichere**
+- Zile 46: **„Diverses“ cha nid glöscht wärde: Dert lande d Buechige vo glöschte Kategorie.**
+- Zile 63: **Neui Kategorie**
+- Zile 82: **Abbräche**
+- Zile 96: **Die Kategorie het keni Buechige.**
+- Zile 97: **1 Buechig chunnt nach „Diverses“.**
+- Zile 98: **\(category.expenseCount) Buechige chöme nach „Diverses“.**
+- Zile 150: **Name**
+- Zile 151: **z. B. Gschänk**
+- Zile 156: **Farb**
+- Zile 171: **Farb \(index + 1)**
+- Zile 179: **Symbol**
+- Zile 204: **Kategorie bearbeite**
+- Zile 211: **Sichere**
 
 ## Tagesaagabe
 
@@ -132,11 +132,11 @@ Wenn dir öppis nid passt: säg mer d Zile, i ändere's.
 
 `Sackgaeud/Model/CategorySeed.swift`
 
-- **Ässe**
-- **Uswärts ässe**
-- **Freizyt**
-- **Ichoufe**
-- **Mobilität**
+- **Ässä uswärts**
+- **Snacks**
+- **Technik**
+- **Hobby**
+- **Shopping**
 - **Diverses**
 
 ## Face ID

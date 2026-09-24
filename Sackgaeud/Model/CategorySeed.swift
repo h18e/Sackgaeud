@@ -21,18 +21,49 @@ enum CategorySeed {
 
     static let templates: [Template] = [
         Template(id: UUID(uuidString: "5AC6A0D0-0000-4000-8000-000000000001")!,
-                 name: "Ässe", symbol: "cart", colorIndex: 2, isFallback: false),
+                 name: "Ässä uswärts", symbol: "fork.knife", colorIndex: 1, isFallback: false),
         Template(id: UUID(uuidString: "5AC6A0D0-0000-4000-8000-000000000002")!,
-                 name: "Uswärts ässe", symbol: "fork.knife", colorIndex: 1, isFallback: false),
+                 name: "Snacks", symbol: "popcorn", colorIndex: 7, isFallback: false),
         Template(id: UUID(uuidString: "5AC6A0D0-0000-4000-8000-000000000003")!,
-                 name: "Freizyt", symbol: "figure.hiking", colorIndex: 0, isFallback: false),
+                 name: "Technik", symbol: "laptopcomputer", colorIndex: 0, isFallback: false),
         Template(id: UUID(uuidString: "5AC6A0D0-0000-4000-8000-000000000004")!,
-                 name: "Ichoufe", symbol: "bag", colorIndex: 6, isFallback: false),
+                 name: "Hobby", symbol: "paintpalette", colorIndex: 5, isFallback: false),
         Template(id: UUID(uuidString: "5AC6A0D0-0000-4000-8000-000000000005")!,
-                 name: "Mobilität", symbol: "tram", colorIndex: 5, isFallback: false),
+                 name: "Shopping", symbol: "bag", colorIndex: 6, isFallback: false),
         Template(id: fallbackID,
                  name: "Diverses", symbol: "ellipsis.circle", colorIndex: 3, isFallback: true)
     ]
+
+    /// Erstes Startset (bis 24.09.2026). Kategorien, die noch genau so aussehen,
+    /// werden beim Start auf das neue Startset umgestellt – ihre Buchungen wandern mit.
+    /// Was du selbst umbenannt hast, bleibt unberührt.
+    private static let legacyTemplates: [UUID: (name: String, symbol: String, colorIndex: Int)] = [
+        UUID(uuidString: "5AC6A0D0-0000-4000-8000-000000000001")!: ("Ässe", "cart", 2),
+        UUID(uuidString: "5AC6A0D0-0000-4000-8000-000000000002")!: ("Uswärts ässe", "fork.knife", 1),
+        UUID(uuidString: "5AC6A0D0-0000-4000-8000-000000000003")!: ("Freizyt", "figure.hiking", 0),
+        UUID(uuidString: "5AC6A0D0-0000-4000-8000-000000000004")!: ("Ichoufe", "bag", 6),
+        UUID(uuidString: "5AC6A0D0-0000-4000-8000-000000000005")!: ("Mobilität", "tram", 5)
+    ]
+
+    /// Stellt unveränderte Kategorien des ersten Startsets auf das aktuelle um.
+    static func migrateLegacyTemplates(in context: ModelContext) {
+        guard let all = try? context.fetch(FetchDescriptor<SpendingCategory>()) else { return }
+        var changed = false
+        for category in all {
+            guard let legacy = legacyTemplates[category.id],
+                  legacy.name == category.name,
+                  legacy.symbol == category.symbol,
+                  legacy.colorIndex == category.colorIndex,
+                  let current = templates.first(where: { $0.id == category.id }) else { continue }
+            category.name = current.name
+            category.symbol = current.symbol
+            category.colorIndex = current.colorIndex
+            changed = true
+        }
+        if changed {
+            try? context.save()
+        }
+    }
 
     /// Legt das Startset an, falls noch gar keine Kategorie existiert.
     static func seedIfNeeded(in context: ModelContext) {

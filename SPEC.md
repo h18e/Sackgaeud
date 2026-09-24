@@ -110,11 +110,11 @@ Beziehungen optional.
 
 | Name | Symbol |
 |---|---|
-| Ässe | `cart` |
-| Uswärts ässe | `fork.knife` |
-| Freizyt | `figure.hiking` |
-| Ichoufe | `bag` |
-| Mobilität | `tram` |
+| Ässä uswärts | `fork.knife` |
+| Snacks | `popcorn` |
+| Technik | `laptopcomputer` |
+| Hobby | `paintpalette` |
+| Shopping | `bag` |
 | Diverses | `ellipsis.circle` *(nicht löschbar)* |
 
 **Löschen einer Kategorie:** Ihre Buchungen wandern nach „Diverses", danach wird sie
