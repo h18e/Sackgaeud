@@ -88,7 +88,12 @@ Diese Regeln liegen als reine Funktionen in der Domain-Schicht und bekommen Test
   November −20 → Dezember 50.
 - **Budgetjahr:** Periode „Januar" (ab 25.12.) bis Periode „Dezember" (bis 24.12.).
   Mit der Periode „Januar" beginnt das Defizit wieder bei 0.
-- Anzeige in der laufenden Periode: „Zum Uusglyche: höchschtens CHF X pro Tag bis
+- Anzeige auf dem Hauptbildschirm (Nachtrag 24.09.2026): **geschwungener
+  Flächengraph** mit dem Verlauf des Defizits im laufenden Budgetjahr – je Periode
+  ab „Januar" das offene Defizit zu ihrem Beginn. Linie rot, Fläche darunter von
+  100 % Deckkraft an der Linie bis 0 % an der x-Achse. Antippen zeigt den Wert einer
+  Periode. Erscheint nur, wenn es im laufenden Jahr ein Defizit gab.
+- Unter dem Graphen: „Zum Uusglyche: höchschtens CHF X pro Tag bis
   zum 24." mit X = (Rest − Defizit) ÷ verbleibende Tage. Reicht die Periode nicht,
   steht, wie viel auch ohne weitere Ausgaben offen bleibt. In der Periode „Dezember"
   zusätzlich der Hinweis auf die Rückstellung am 25.12.

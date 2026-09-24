@@ -45,9 +45,28 @@ struct BudgetLedger {
         BudgetMath.deficit(before: period, calendar: calendar) { result(of: $0) }
     }
 
+    /// Verlauf des Defizits im Budgetjahr von `period`: je Periode ab „Januar" bis
+    /// `period` das offene Defizit zu ihrem Beginn (für den Graphen, SPEC 2.5).
+    func deficitCourse(until period: BudgetPeriod) -> [DeficitPoint] {
+        var points: [DeficitPoint] = []
+        var current = period.firstOfBudgetYear(calendar: calendar)
+        while current <= period {
+            points.append(DeficitPoint(period: current, rappen: deficit(before: current)))
+            current = current.next(calendar: calendar)
+        }
+        return points
+    }
+
     /// Offenes Defizit nach Abschluss der Periode (was sie der nächsten mitgibt).
     /// Nach der Periode „Dezember" beginnt das neue Jahr trotzdem bei 0.
     func deficit(after period: BudgetPeriod) -> Int {
         max(0, deficit(before: period) - result(of: period))
     }
+}
+
+/// Ein Punkt im Defizit-Graphen: offenes Defizit zu Beginn einer Periode.
+struct DeficitPoint: Identifiable, Equatable {
+    let period: BudgetPeriod
+    let rappen: Int
+    var id: Int { period.key }
 }

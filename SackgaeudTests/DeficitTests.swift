@@ -80,4 +80,17 @@ struct DeficitTests {
         #expect(ledger.deficit(after: period(202608)) == 10_000)
         #expect(ledger.deficit(after: period(202609)) == 5_000)
     }
+
+    @Test("Verlauf fürs Diagramm: ab Periode „Januar“ bis zur laufenden")
+    func course() {
+        let settings = [AmountSetting(periodKey: 202512, amountRappen: 100_000, updatedAt: .now)]
+        let expenses: [(date: Date, rappen: Int)] = [
+            (TestCalendar.date(2026, 2, 1), 130_000),   // Periode 202601 („Februar“): −30'000
+            (TestCalendar.date(2026, 3, 1), 90_000)     // Periode 202602 („März“): +10'000
+        ]
+        let ledger = BudgetLedger(settings: settings, expenses: expenses, calendar: calendar)
+        let points = ledger.deficitCourse(until: period(202603))
+        #expect(points.map { $0.period.key } == [202512, 202601, 202602, 202603])
+        #expect(points.map { $0.rappen } == [0, 0, 30_000, 20_000])
+    }
 }

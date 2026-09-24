@@ -34,19 +34,28 @@ Wenn dir öppis nid passt: säg mer d Zile, i ändere's.
 - Zile 23: **Verlouf**
 - Zile 29: **Istellige**
 - Zile 42: **Usgab erfasse**
-- Zile 128: **No nüt erfasst**
-- Zile 129: **Tipp uf „Usgab erfasse“, sobald du öppis zahlt hesch.**
-- Zile 160: **vo \(MoneyFormat.chf(summary.amountRappen))**
-- Zile 176: **Überzoge um \(MoneyFormat.spoken(-summary.restRappen)), vo \(MoneyFormat.spoken(summary.amountRappen))**
-- Zile 178: **No \(MoneyFormat.spoken(summary.restRappen)) übrig, vo \(MoneyFormat.spoken(summary.amountRappen))**
-- Zile 195: **Defizit us früechere Periode**
-- Zile 207: **Zum Uusglyche: höchschtens \(MoneyFormat.chf(daily)) pro Tag bis zum 24.**
-- Zile 209: **Die Periode reicht nid für e ganze Uusglych – o ohni wyteri Usgabe blybe \(MoneyFormat.chf(-status.spendableAfterCompensation)) offe.**
-- Zile 212: **Am 25.12. fangt ds Defizit wieder bi null a.**
-- Zile 233: **Überzoge um \(MoneyFormat.chf(-summary.restRappen))**
-- Zile 238: **No \(MoneyFormat.chf(daily)) pro Tag für \(DailyLine.days(summary.remainingDays))**
-- Zile 247: **1 Tag**
-- Zile 247: **\(count) Täg**
+- Zile 131: **No nüt erfasst**
+- Zile 132: **Tipp uf „Usgab erfasse“, sobald du öppis zahlt hesch.**
+- Zile 163: **vo \(MoneyFormat.chf(summary.amountRappen))**
+- Zile 179: **Überzoge um \(MoneyFormat.spoken(-summary.restRappen)), vo \(MoneyFormat.spoken(summary.amountRappen))**
+- Zile 181: **No \(MoneyFormat.spoken(summary.restRappen)) übrig, vo \(MoneyFormat.spoken(summary.amountRappen))**
+- Zile 194: **Überzoge um \(MoneyFormat.chf(-summary.restRappen))**
+- Zile 199: **No \(MoneyFormat.chf(daily)) pro Tag für \(DailyLine.days(summary.remainingDays))**
+- Zile 208: **1 Tag**
+- Zile 208: **\(count) Täg**
+
+## Hauptbildschirm – Defizit-Graph
+
+`Sackgaeud/Features/Overview/DeficitChartCard.swift`
+
+- Zile 47: **Defizit \(String(period.budgetYear))**
+- Zile 50: **offe am Afang vo jeder Periode**
+- Zile 74: **Periode**
+- Zile 75: **Defizit**
+- Zile 133: **Verlauf vom Defizit \(String(period.budgetYear))**
+- Zile 141: **Zum Uusglyche: höchschtens \(MoneyFormat.chf(daily)) pro Tag bis zum 24.**
+- Zile 143: **Die Periode reicht nid für e ganze Uusglych – o ohni wyteri Usgabe blybe \(MoneyFormat.chf(-status.spendableAfterCompensation)) offe.**
+- Zile 147: **Am 25.12. fangt ds Defizit wieder bi null a.**
 
 ## Usgab erfasse & bearbeite
 
@@ -177,7 +186,7 @@ Wenn dir öppis nid passt: säg mer d Zile, i ändere's.
 
 ---
 
-**103 Täxt total.**
+**107 Täxt total.**
 
 Nid uf Mundart, mit Absicht: dr Bereich „Entwicklung" i de Istellige (nume i
 Debug-Builds sichtbar), Log-Mäudige und d Kommentär im Code. Die si für

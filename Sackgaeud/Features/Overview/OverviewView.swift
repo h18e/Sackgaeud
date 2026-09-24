@@ -86,14 +86,17 @@ private struct OverviewContent: View {
         _earlierExpenses = Query(filter: #Predicate<Expense> { $0.date >= yearStart && $0.date < start })
     }
 
-    private var deficitStatus: DeficitStatus? {
+    /// Defizit-Verlauf dieses Budgetjahrs. `nil`, solange es im ganzen Jahr nie ein
+    /// Defizit gab – dann bleibt der Hauptbildschirm so ruhig wie bisher.
+    private var deficitChart: (points: [DeficitPoint], status: DeficitStatus)? {
         let ledger = BudgetLedger(
             settings: amounts.map(\.setting),
             expenses: earlierExpenses.map { (date: $0.date, rappen: $0.amountRappen) }
         )
-        let deficit = ledger.deficit(before: period)
-        guard deficit > 0 else { return nil }
-        return DeficitStatus(deficitRappen: deficit, summary: summary)
+        let points = ledger.deficitCourse(until: period)
+        guard points.contains(where: { $0.rappen > 0 }) else { return nil }
+        let status = DeficitStatus(deficitRappen: points.last?.rappen ?? 0, summary: summary)
+        return (points, status)
     }
 
     private var summary: BudgetSummary {
@@ -113,8 +116,8 @@ private struct OverviewContent: View {
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
 
-                if let deficitStatus {
-                    DeficitCard(period: period, status: deficitStatus)
+                if let deficitChart {
+                    DeficitChartCard(points: deficitChart.points, status: deficitChart.status, period: period)
                         .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 8, trailing: 16))
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)
@@ -176,48 +179,6 @@ private struct RestCard: View {
             return "Überzoge um \(MoneyFormat.spoken(-summary.restRappen)), vo \(MoneyFormat.spoken(summary.amountRappen))"
         }
         return "No \(MoneyFormat.spoken(summary.restRappen)) übrig, vo \(MoneyFormat.spoken(summary.amountRappen))"
-    }
-}
-
-/// Offenes Defizit aus früheren Perioden, separat vom Restbetrag (SPEC 2.5).
-///
-/// Der Restbetrag oben bleibt die Zahl dieser Periode. Diese Karte zeigt zusätzlich,
-/// was es braucht, um das Defizit bis zum 24. auszugleichen.
-private struct DeficitCard: View {
-    let period: BudgetPeriod
-    let status: DeficitStatus
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 6) {
-                Image(systemName: "arrow.uturn.down.circle")
-                    .foregroundStyle(Theme.negative)
-                Text("Defizit us früechere Periode")
-                    .foregroundStyle(Theme.textSecondary)
-                Spacer(minLength: 8)
-                Text(MoneyFormat.chf(status.deficitRappen))
-                    .fontWeight(.semibold)
-                    .monospacedDigit()
-                    .foregroundStyle(Theme.negative)
-            }
-            .font(.subheadline)
-
-            Group {
-                if let daily = status.dailyWithCompensation {
-                    Text("Zum Uusglyche: höchschtens \(MoneyFormat.chf(daily)) pro Tag bis zum 24.")
-                } else if status.summary.remainingDays > 0 {
-                    Text("Die Periode reicht nid für e ganze Uusglych – o ohni wyteri Usgabe blybe \(MoneyFormat.chf(-status.spendableAfterCompensation)) offe.")
-                }
-                if period.next().startsBudgetYear {
-                    Text("Am 25.12. fangt ds Defizit wieder bi null a.")
-                }
-            }
-            .font(.footnote)
-            .foregroundStyle(Theme.textSecondary)
-            .monospacedDigit()
-        }
-        .card(padding: 14)
-        .accessibilityElement(children: .combine)
     }
 }
 

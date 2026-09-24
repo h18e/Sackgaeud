@@ -126,6 +126,16 @@ struct BudgetPeriod: Hashable, Comparable, Identifiable {
         return formatter.string(from: lastDay(calendar: calendar))
     }
 
+    /// Kurzname für Achsen, z. B. „Okt." (nach dem Monat, in dem die Periode endet).
+    func shortTitle(calendar: Calendar = .current) -> String {
+        let formatter = DateFormatter()
+        formatter.calendar = calendar
+        formatter.timeZone = calendar.timeZone
+        formatter.locale = Locale(identifier: "de_CH")
+        formatter.setLocalizedDateFormatFromTemplate("LLL")
+        return formatter.string(from: lastDay(calendar: calendar))
+    }
+
     /// Zeitraum als „25.09.–24.10.".
     func rangeText(calendar: Calendar = .current) -> String {
         let formatter = DateFormatter()

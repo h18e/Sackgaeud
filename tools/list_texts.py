@@ -21,6 +21,7 @@ SCREENS = [
     ('Sackgaeud/App/RootView.swift', 'Sperre & Rückgängig'),
     ('Sackgaeud/Features/Onboarding/OnboardingView.swift', 'Erschte Start'),
     ('Sackgaeud/Features/Overview/OverviewView.swift', 'Hauptbildschirm'),
+    ('Sackgaeud/Features/Overview/DeficitChartCard.swift', 'Hauptbildschirm – Defizit-Graph'),
     ('Sackgaeud/Features/ExpenseEditor/ExpenseEditorView.swift', 'Usgab erfasse & bearbeite'),
     ('Sackgaeud/Features/ExpenseEditor/ExpenseSections.swift', 'Buechige-Liste'),
     ('Sackgaeud/Features/History/HistoryView.swift', 'Verlouf'),
