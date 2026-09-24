@@ -19,7 +19,7 @@ laufende Kosten.
 | Startbetrag | **Ein fester Betrag** in den Einstellungen, gilt automatisch für jede Periode. |
 | Periodenende | **Jede Periode startet frisch** mit dem vollen Betrag. Ein Überzug wird als **Defizit separat** in die Folgeperioden mitgenommen und durch Einsparungen ausgeglichen; Rückstellung auf 0 mit der Periode „Januar" (SPEC 2.5). |
 | Erfassung | **Manuell.** Kein Bank-Import. |
-| Buchung | **Betrag, Kategorie, Datum** (Vorgabe heute). **Keine Notiz, keine Gutschriften.** |
+| Buchung | **Betrag, Kategorie, Datum** (Vorgabe heute), **optional eine Notiz** (Nachtrag 24.09.2026). **Keine Gutschriften.** |
 | Nutzer | **Nur Raphi.** iCloud-Sync zwischen den eigenen Geräten, kein Teilen. |
 | Währung | **Nur CHF.** Anzeige auf 5 Rappen gerundet, gespeichert auf den Rappen genau. |
 | Widget | **Ja, nur Anzeige** des Restbetrags. Erfassen übers Widget erst in v2. |
@@ -111,6 +111,7 @@ Beziehungen optional.
 | date | Date | nur der Tag zählt (Mitternacht, Gerätekalender) |
 | category | Category? | n:1; fehlt sie (Sync-Randfall), zählt die Buchung als „Diverses" |
 | createdAt | Date | für die Reihenfolge innerhalb eines Tages |
+| note | String | freiwillige Notiz, leer = keine (Nachtrag 24.09.2026) |
 
 ### 3.2 Category (Kategorie)
 
@@ -195,6 +196,8 @@ Ziel: **unter 5 Sekunden** vom Antippen bis zum Sichern.
 - Blatt öffnet sich mit **aktivem Zahlenfeld** (Dezimaltastatur), Kursor bereit.
 - Darunter die Kategorien als **Raster antippbarer Kacheln**; die zuletzt benutzte ist
   vorgewählt.
+- Darunter ein freiwilliges **Notizfeld** (bis 3 Zeilen); die Notiz erscheint in
+  der Buchungsliste klein unter der Kategorie.
 - Datum: Vorgabe **heute**, als kompakter Datumswähler. Zukünftige Daten sind nicht
   möglich *(siehe 9)*; rückdatieren in vergangene Perioden ist erlaubt.
 - „Sichere" ist aktiv, sobald ein gültiger Betrag dasteht.
@@ -339,7 +342,7 @@ den Namen `Category` bereits belegt.
 | CSV-Export als eigenes Backup | v2 |
 | Mitteilungen (neue Periode, wenig Rest, Erinnerung) | v2 |
 | Trends über mehrere Perioden | v2 |
-| Notiz zur Buchung, Gutschriften | nicht vorgesehen |
+| Gutschriften | nicht vorgesehen |
 | Limiten je Kategorie, Übertrag von Überschüssen, Fixkosten | nicht vorgesehen |
 | Teilen mit einer zweiten Person | nicht vorgesehen |
 

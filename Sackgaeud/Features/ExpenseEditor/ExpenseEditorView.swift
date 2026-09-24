@@ -22,6 +22,7 @@ struct ExpenseEditorView: View {
     @State private var amountText: String
     @State private var date: Date
     @State private var selectedCategoryID: UUID?
+    @State private var note: String
     @FocusState private var amountFocused: Bool
 
     init(expense: Expense?) {
@@ -29,6 +30,7 @@ struct ExpenseEditorView: View {
         _amountText = State(initialValue: expense.map { MoneyFormat.inputText($0.amountRappen) } ?? "")
         _date = State(initialValue: expense?.date ?? .now)
         _selectedCategoryID = State(initialValue: expense?.category?.id)
+        _note = State(initialValue: expense?.note ?? "")
     }
 
     private var amountRappen: Int? { MoneyFormat.parse(amountText) }
@@ -51,6 +53,7 @@ struct ExpenseEditorView: View {
                 VStack(alignment: .leading, spacing: 20) {
                     amountField
                     categoryGrid
+                    noteField
                     dateRow
                     if isEditing {
                         deleteButton
@@ -118,6 +121,15 @@ struct ExpenseEditorView: View {
         }
     }
 
+    /// Freiwillig und bewusst unterhalb der Kategorien: Wer nichts notieren will,
+    /// sichert wie bisher direkt nach Betrag und Kategorie.
+    private var noteField: some View {
+        TextField("Notiz (fryywillig)", text: $note, axis: .vertical)
+            .lineLimit(1...3)
+            .foregroundStyle(Theme.textPrimary)
+            .card(padding: 12)
+    }
+
     private var dateRow: some View {
         VStack(alignment: .leading, spacing: 8) {
             DatePicker("Datum", selection: $date, in: ...latestDate, displayedComponents: .date)
@@ -170,9 +182,9 @@ struct ExpenseEditorView: View {
         let repository = BudgetRepository(context: context)
         let category = selectedCategory
         if let expense {
-            repository.update(expense, amountRappen: amountRappen, date: date, category: category)
+            repository.update(expense, amountRappen: amountRappen, date: date, category: category, note: note)
         } else {
-            repository.addExpense(amountRappen: amountRappen, date: date, category: category)
+            repository.addExpense(amountRappen: amountRappen, date: date, category: category, note: note)
         }
         if let category {
             lastCategoryID = category.id.uuidString

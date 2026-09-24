@@ -16,12 +16,16 @@ final class Expense {
     var createdAt: Date = Date.now
     /// Fehlt sie (Sync-Randfall), zählt die Buchung als „Diverses".
     var category: SpendingCategory?
+    /// Freiwillige Notiz, leer = keine. Mit Standardwert, damit bestehende Buchungen
+    /// und der iCloud-Abgleich ohne Umbau weiterlaufen.
+    var note: String = ""
 
     init(
         id: UUID = UUID(),
         amountRappen: Int,
         date: Date,
         category: SpendingCategory?,
+        note: String = "",
         createdAt: Date = .now,
         calendar: Calendar = .current
     ) {
@@ -29,6 +33,7 @@ final class Expense {
         self.amountRappen = amountRappen
         self.date = calendar.startOfDay(for: date)
         self.category = category
+        self.note = note
         self.createdAt = createdAt
     }
 }

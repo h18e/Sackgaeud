@@ -52,13 +52,14 @@ Wenn dir öppis nid passt: säg mer d Zile, i ändere's.
 
 `Sackgaeud/Features/ExpenseEditor/ExpenseEditorView.swift`
 
-- Zile 63: **Buechig bearbeite**
-- Zile 63: **Usgab erfasse**
-- Zile 67: **Abbräche**
-- Zile 70: **Sichere**
-- Zile 98: **Betrag i Franke**
-- Zile 130: **Chunnt i \(period.title())**
-- Zile 144: **Buechig lösche**
+- Zile 66: **Buechig bearbeite**
+- Zile 66: **Usgab erfasse**
+- Zile 70: **Abbräche**
+- Zile 73: **Sichere**
+- Zile 101: **Betrag i Franke**
+- Zile 127: **Notiz (fryywillig)**
+- Zile 142: **Chunnt i \(period.title())**
+- Zile 156: **Buechig lösche**
 
 ## Buechige-Liste
 
@@ -140,8 +141,8 @@ Wenn dir öppis nid passt: säg mer d Zile, i ändere's.
 
 `Sackgaeud/Features/Shared/Components.swift`
 
-- Zile 224: **Hüt**
-- Zile 227: **Geschter**
+- Zile 235: **Hüt**
+- Zile 238: **Geschter**
 
 ## Startset vo de Kategorie
 
@@ -176,7 +177,7 @@ Wenn dir öppis nid passt: säg mer d Zile, i ändere's.
 
 ---
 
-**102 Täxt total.**
+**103 Täxt total.**
 
 Nid uf Mundart, mit Absicht: dr Bereich „Entwicklung" i de Istellige (nume i
 Debug-Builds sichtbar), Log-Mäudige und d Kommentär im Code. Die si für

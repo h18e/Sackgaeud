@@ -34,15 +34,22 @@ struct BudgetRepository {
     // MARK: - Buchungen
 
     @discardableResult
-    func addExpense(amountRappen: Int, date: Date, category: SpendingCategory?) -> Expense {
-        let expense = Expense(amountRappen: amountRappen, date: date, category: category, calendar: calendar)
+    func addExpense(amountRappen: Int, date: Date, category: SpendingCategory?, note: String = "") -> Expense {
+        let expense = Expense(
+            amountRappen: amountRappen,
+            date: date,
+            category: category,
+            note: Self.cleaned(note),
+            calendar: calendar
+        )
         context.insert(expense)
         save()
         return expense
     }
 
-    func update(_ expense: Expense, amountRappen: Int, date: Date, category: SpendingCategory?) {
+    func update(_ expense: Expense, amountRappen: Int, date: Date, category: SpendingCategory?, note: String) {
         expense.amountRappen = amountRappen
+        expense.note = Self.cleaned(note)
         expense.date = calendar.startOfDay(for: date)
         expense.category = category
         save()
@@ -56,7 +63,8 @@ struct BudgetRepository {
             amountRappen: expense.amountRappen,
             date: expense.date,
             createdAt: expense.createdAt,
-            categoryID: expense.category?.id
+            categoryID: expense.category?.id,
+            note: expense.note
         )
         context.delete(expense)
         save()
@@ -71,6 +79,7 @@ struct BudgetRepository {
             amountRappen: deleted.amountRappen,
             date: deleted.date,
             category: restoredCategory ?? fallbackCategory(),
+            note: deleted.note,
             createdAt: deleted.createdAt,
             calendar: calendar
         ))
@@ -149,6 +158,11 @@ struct BudgetRepository {
         setAmount(amountRappen, today: today)
     }
 
+    /// Notiz ohne Leerzeichen und Zeilenumbrüche am Rand.
+    static func cleaned(_ note: String) -> String {
+        note.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     private func save() {
         try? context.save()
     }
@@ -161,4 +175,5 @@ struct DeletedExpense {
     let date: Date
     let createdAt: Date
     let categoryID: UUID?
+    let note: String
 }

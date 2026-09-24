@@ -101,6 +101,12 @@ struct ExpenseRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(display.name)
                     .foregroundStyle(Theme.textPrimary)
+                if !expense.note.isEmpty {
+                    Text(expense.note)
+                        .font(.caption)
+                        .foregroundStyle(Theme.textSecondary)
+                        .lineLimit(2)
+                }
                 if showsDate {
                     Text(DayFormat.short(expense.date))
                         .font(.caption)
@@ -114,7 +120,12 @@ struct ExpenseRow: View {
         }
         .contentShape(Rectangle())
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(display.name), \(MoneyFormat.spoken(expense.amountRappen))")
+        .accessibilityLabel(accessibilityText(category: display.name))
+    }
+
+    private func accessibilityText(category: String) -> String {
+        let amount = MoneyFormat.spoken(expense.amountRappen)
+        return expense.note.isEmpty ? "\(category), \(amount)" : "\(category), \(expense.note), \(amount)"
     }
 }
 
