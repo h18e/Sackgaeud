@@ -96,10 +96,10 @@ Wenn dir öppis nid passt: säg mer d Zile, i ändere's.
 - Zile 69: **Usgabe**
 - Zile 73: **Ergäbnis**
 - Zile 79: **Defizit vorhär**
-- Zile 83: **Defizit nachhär**
-- Zile 97: **Nach Kategorie**
-- Zile 106: **\(Int((Double(entry.rappen) / Double(total) * 100).rounded())) %**
-- Zile 116: **Kei Buechige i dere Periode**
+- Zile 85: **Defizit nachhär**
+- Zile 99: **Nach Kategorie**
+- Zile 108: **\(Int((Double(entry.rappen) / Double(total) * 100).rounded())) %**
+- Zile 118: **Kei Buechige i dere Periode**
 
 ## Istellige
 

@@ -213,7 +213,8 @@ Ziel: **unter 5 Sekunden** vom Antippen bis zum Sichern.
   alle Buchungen dieser Perioden, nach einer Rückfrage mit der Anzahl, ohne
   Rückgängig. So bleibt ein offenes Defizit bis zum 24.12. immer vorhanden.
 - Antippen → Periodendetail:
-  - Betrag, Ausgaben, Ergebnis, Defizit vorher und nachher
+  - Betrag, Ausgaben, Ergebnis, Defizit vorher und nachher – immer sichtbar,
+    CHF 0.– grün, ein offenes Defizit rot, „nachher" zusätzlich fett
   - **Balken je Kategorie**, absteigend nach Summe, mit Betrag und Anteil
   - alle Buchungen der Periode, bearbeitbar wie auf dem Hauptbildschirm
 

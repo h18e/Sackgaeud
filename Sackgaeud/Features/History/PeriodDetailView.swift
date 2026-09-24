@@ -73,18 +73,20 @@ struct PeriodDetailView: View {
                     LabeledValueRow(label: "Ergäbnis") {
                         ResultLabel(summary: summary, isCurrent: period.contains(today))
                     }
+                    // Immer sichtbar: 0 grün, offenes Defizit rot – nachher zusätzlich fett.
                     let deficits = self.deficits
-                    if deficits.before > 0 || deficits.after > 0 {
-                        Divider().overlay(Theme.separator)
-                        LabeledValueRow(label: "Defizit vorhär") {
-                            Text(MoneyFormat.chf(deficits.before)).monospacedDigit()
-                        }
-                        if !period.contains(today) {
-                            LabeledValueRow(label: "Defizit nachhär") {
-                                Text(MoneyFormat.chf(deficits.after))
-                                    .monospacedDigit()
-                                    .foregroundStyle(deficits.after > 0 ? Theme.negative : Theme.accent)
-                            }
+                    Divider().overlay(Theme.separator)
+                    LabeledValueRow(label: "Defizit vorhär") {
+                        Text(MoneyFormat.chf(deficits.before))
+                            .monospacedDigit()
+                            .foregroundStyle(deficits.before > 0 ? Theme.negative : Theme.accent)
+                    }
+                    if !period.contains(today) {
+                        LabeledValueRow(label: "Defizit nachhär") {
+                            Text(MoneyFormat.chf(deficits.after))
+                                .monospacedDigit()
+                                .fontWeight(deficits.after > 0 ? .bold : .regular)
+                                .foregroundStyle(deficits.after > 0 ? Theme.negative : Theme.accent)
                         }
                     }
                 }
