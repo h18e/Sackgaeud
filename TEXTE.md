@@ -34,15 +34,19 @@ Wenn dir öppis nid passt: säg mer d Zile, i ändere's.
 - Zile 23: **Verlouf**
 - Zile 29: **Istellige**
 - Zile 42: **Usgab erfasse**
-- Zile 107: **No nüt erfasst**
-- Zile 108: **Tipp uf „Usgab erfasse“, sobald du öppis zahlt hesch.**
-- Zile 139: **vo \(MoneyFormat.chf(summary.amountRappen))**
-- Zile 155: **Überzoge um \(MoneyFormat.spoken(-summary.restRappen)), vo \(MoneyFormat.spoken(summary.amountRappen))**
-- Zile 157: **No \(MoneyFormat.spoken(summary.restRappen)) übrig, vo \(MoneyFormat.spoken(summary.amountRappen))**
-- Zile 170: **Überzoge um \(MoneyFormat.chf(-summary.restRappen))**
-- Zile 175: **No \(MoneyFormat.chf(daily)) pro Tag für \(DailyLine.days(summary.remainingDays))**
-- Zile 184: **1 Tag**
-- Zile 184: **\(count) Täg**
+- Zile 128: **No nüt erfasst**
+- Zile 129: **Tipp uf „Usgab erfasse“, sobald du öppis zahlt hesch.**
+- Zile 160: **vo \(MoneyFormat.chf(summary.amountRappen))**
+- Zile 176: **Überzoge um \(MoneyFormat.spoken(-summary.restRappen)), vo \(MoneyFormat.spoken(summary.amountRappen))**
+- Zile 178: **No \(MoneyFormat.spoken(summary.restRappen)) übrig, vo \(MoneyFormat.spoken(summary.amountRappen))**
+- Zile 195: **Defizit us früechere Periode**
+- Zile 207: **Zum Uusglyche: höchschtens \(MoneyFormat.chf(daily)) pro Tag bis zum 24.**
+- Zile 209: **Die Periode reicht nid für e ganze Uusglych – o ohni wyteri Usgabe blybe \(MoneyFormat.chf(-status.spendableAfterCompensation)) offe.**
+- Zile 212: **Am 25.12. fangt ds Defizit wieder bi null a.**
+- Zile 233: **Überzoge um \(MoneyFormat.chf(-summary.restRappen))**
+- Zile 238: **No \(MoneyFormat.chf(daily)) pro Tag für \(DailyLine.days(summary.remainingDays))**
+- Zile 247: **1 Tag**
+- Zile 247: **\(count) Täg**
 
 ## Usgab erfasse & bearbeite
 
@@ -66,25 +70,36 @@ Wenn dir öppis nid passt: säg mer d Zile, i ändere's.
 
 `Sackgaeud/Features/History/HistoryView.swift`
 
-- Zile 58: **Verlouf**
-- Zile 77: **\(row.period.rangeText()) · louft no**
-- Zile 103: **überzoge**
-- Zile 103: **no übrig**
-- Zile 103: **übrig**
-- Zile 113: **\u{2212} \(MoneyFormat.chf(-rest))**
-- Zile 113: **+ \(MoneyFormat.chf(rest))**
-- Zile 118: **Überzoge um \(MoneyFormat.spoken(-rest))**
-- Zile 118: **\(MoneyFormat.spoken(rest)) übrig**
+- Zile 68: **Lösche**
+- Zile 78: **Lösche chasch nume Periode us früechere Jahr – so blybt es offes Defizit bis zum 24.12. geng sichtbar.**
+- Zile 83: **Verlouf**
+- Zile 89: **Früecheri Jahr lösche**
+- Zile 107: **Abbräche**
+- Zile 111: **Das cha nid rückgängig gmacht wärde.**
+- Zile 117: **1 Buechig**
+- Zile 117: **\(count) Buechige**
+- Zile 145: **Defizit \(amount) · am 25.12. zrüggsetzt**
+- Zile 145: **Defizit \(amount)**
+- Zile 153: **\(row.period.rangeText()) · louft no**
+- Zile 185: **überzoge**
+- Zile 185: **no übrig**
+- Zile 185: **übrig**
+- Zile 195: **\u{2212} \(MoneyFormat.chf(-rest))**
+- Zile 195: **+ \(MoneyFormat.chf(rest))**
+- Zile 200: **Überzoge um \(MoneyFormat.spoken(-rest))**
+- Zile 200: **\(MoneyFormat.spoken(rest)) übrig**
 
 ## Periode im Detail
 
 `Sackgaeud/Features/History/PeriodDetailView.swift`
 
-- Zile 55: **Usgabe**
-- Zile 59: **Ergäbnis**
-- Zile 69: **Nach Kategorie**
-- Zile 78: **\(Int((Double(entry.rappen) / Double(total) * 100).rounded())) %**
-- Zile 88: **Kei Buechige i dere Periode**
+- Zile 69: **Usgabe**
+- Zile 73: **Ergäbnis**
+- Zile 79: **Defizit vorhär**
+- Zile 83: **Defizit nachhär**
+- Zile 97: **Nach Kategorie**
+- Zile 106: **\(Int((Double(entry.rappen) / Double(total) * 100).rounded())) %**
+- Zile 116: **Kei Buechige i dere Periode**
 
 ## Istellige
 
@@ -161,7 +176,7 @@ Wenn dir öppis nid passt: säg mer d Zile, i ändere's.
 
 ---
 
-**87 Täxt total.**
+**102 Täxt total.**
 
 Nid uf Mundart, mit Absicht: dr Bereich „Entwicklung" i de Istellige (nume i
 Debug-Builds sichtbar), Log-Mäudige und d Kommentär im Code. Die si für

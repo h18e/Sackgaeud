@@ -151,7 +151,8 @@ In Xcode: **⌘ + U**
 
 Geprüft wird die Rechenlogik: Periodenwechsel am 25. um Mitternacht, Jahreswechsel,
 Februar, Sommerzeit, verbleibende Tage, Tagesbudget, Überzug, Periodenbetrag nach
-einer Änderung, 5-Rappen-Rundung, Eingabe von Beträgen und die Berechnung im Widget.
+einer Änderung, Defizit über mehrere Perioden samt Rückstellung am 25.12.,
+5-Rappen-Rundung, Eingabe von Beträgen und die Berechnung im Widget.
 Alle Tests müssen grün sein.
 
 ---

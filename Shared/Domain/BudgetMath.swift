@@ -81,6 +81,27 @@ enum BudgetMath {
         )
     }
 
+    /// Offenes Defizit zu Beginn von `period` (SPEC 2.5).
+    ///
+    /// - Ein Überzug vergrössert das Defizit, was übrig bleibt, verkleinert es.
+    /// - Es wird nie negativ: Ein Überschuss ohne offenes Defizit ist kein Guthaben.
+    /// - Die Periode „Januar" (ab 25.12.) beginnt immer bei 0.
+    ///
+    /// `result` liefert für eine abgeschlossene Periode Betrag minus Ausgaben.
+    static func deficit(
+        before period: BudgetPeriod,
+        calendar: Calendar = .current,
+        result: (BudgetPeriod) -> Int
+    ) -> Int {
+        var current = period.firstOfBudgetYear(calendar: calendar)
+        var deficit = 0
+        while current < period {
+            deficit = max(0, deficit - result(current))
+            current = current.next(calendar: calendar)
+        }
+        return deficit
+    }
+
     /// Summe je Kategorie, absteigend nach Betrag (für die Balken im Periodendetail).
     ///
     /// Generisch über den Schlüssel, damit die Logik ohne SwiftData testbar bleibt.
@@ -94,6 +115,23 @@ enum BudgetMath {
         return order
             .map { KeyedTotal(key: $0, rappen: sums[$0] ?? 0) }
             .sorted { $0.rappen > $1.rappen }
+    }
+}
+
+/// Ein offenes Defizit und was es für die laufende Periode heisst (SPEC 2.5).
+struct DeficitStatus: Equatable {
+    /// Offenes Defizit aus früheren Perioden dieses Budgetjahrs.
+    let deficitRappen: Int
+    let summary: BudgetSummary
+
+    /// Was bis zum 24. übrig bleiben darf, wenn das Defizit ganz ausgeglichen werden
+    /// soll. Negativ: Diese Periode reicht nicht für den ganzen Ausgleich.
+    var spendableAfterCompensation: Int { summary.restRappen - deficitRappen }
+
+    /// Tagesbudget, wenn das Defizit bis Periodenende ausgeglichen werden soll.
+    var dailyWithCompensation: Int? {
+        guard spendableAfterCompensation >= 0, summary.remainingDays > 0 else { return nil }
+        return spendableAfterCompensation / summary.remainingDays
     }
 }
 

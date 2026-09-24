@@ -9,6 +9,8 @@ struct PeriodDetailView: View {
     @Environment(\.today) private var today
     @Query private var amounts: [BudgetAmount]
     @Query private var expenses: [Expense]
+    /// Frühere Perioden desselben Budgetjahrs – für das Defizit (SPEC 2.5).
+    @Query private var earlierExpenses: [Expense]
     @State private var editorTarget: ExpenseEditorTarget?
 
     init(period: BudgetPeriod) {
@@ -19,6 +21,18 @@ struct PeriodDetailView: View {
             filter: #Predicate<Expense> { $0.date >= start && $0.date < end },
             sort: [SortDescriptor(\Expense.date, order: .reverse), SortDescriptor(\Expense.createdAt, order: .reverse)]
         )
+        let yearStart = period.firstOfBudgetYear().start
+        _earlierExpenses = Query(filter: #Predicate<Expense> { $0.date >= yearStart && $0.date < start })
+    }
+
+    /// Defizit vor und nach dieser Periode.
+    private var deficits: (before: Int, after: Int) {
+        let ledger = BudgetLedger(
+            settings: amounts.map(\.setting),
+            expenses: (earlierExpenses + expenses).map { (date: $0.date, rappen: $0.amountRappen) }
+        )
+        let isRunning = period.contains(today)
+        return (ledger.deficit(before: period), isRunning ? 0 : ledger.deficit(after: period))
     }
 
     private var summary: BudgetSummary {
@@ -58,6 +72,20 @@ struct PeriodDetailView: View {
                     Divider().overlay(Theme.separator)
                     LabeledValueRow(label: "Ergäbnis") {
                         ResultLabel(summary: summary, isCurrent: period.contains(today))
+                    }
+                    let deficits = self.deficits
+                    if deficits.before > 0 || deficits.after > 0 {
+                        Divider().overlay(Theme.separator)
+                        LabeledValueRow(label: "Defizit vorhär") {
+                            Text(MoneyFormat.chf(deficits.before)).monospacedDigit()
+                        }
+                        if !period.contains(today) {
+                            LabeledValueRow(label: "Defizit nachhär") {
+                                Text(MoneyFormat.chf(deficits.after))
+                                    .monospacedDigit()
+                                    .foregroundStyle(deficits.after > 0 ? Theme.negative : Theme.accent)
+                            }
+                        }
                     }
                 }
                 .listRowBackground(Theme.surface)

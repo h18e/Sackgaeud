@@ -3,44 +3,53 @@ import SwiftUI
 
 /// Liste der Perioden mit Ergebnis, neueste zuoberst (SPEC 4.4).
 ///
-/// Gezeigt wird ab der Periode des Einstiegs (erster gespeicherter Betrag) bis zur
-/// laufenden. Ältere Perioden erscheinen nur, wenn rückdatierte Buchungen darin liegen.
+/// Das laufende Budgetjahr (Periode „Januar" bis heute) erscheint ab dem Einstieg
+/// vollständig. Frühere Jahre nur mit den Perioden, in denen Buchungen liegen – und
+/// nur diese lassen sich löschen, einzeln oder alle zusammen. So bleibt ein offenes
+/// Defizit bis zum 24.12. immer sichtbar (SPEC 2.5).
 struct HistoryView: View {
+    @Environment(\.modelContext) private var context
     @Environment(\.today) private var today
     @Query private var amounts: [BudgetAmount]
     @Query private var expenses: [Expense]
 
+    @State private var pendingDeletion: [BudgetPeriod] = []
+
+    private var current: BudgetPeriod { BudgetPeriod(containing: today) }
+
+    private var ledger: BudgetLedger {
+        BudgetLedger(
+            settings: amounts.map(\.setting),
+            expenses: expenses.map { (date: $0.date, rappen: $0.amountRappen) }
+        )
+    }
+
     private var rows: [HistoryRow] {
-        let current = BudgetPeriod(containing: today)
-        let settings = amounts.map(\.setting)
+        let current = self.current
+        let ledger = self.ledger
+        let firstKey = amounts.map(\.periodKey).min() ?? current.key
 
-        var spentByPeriod: [Int: Int] = [:]
-        for expense in expenses {
-            spentByPeriod[BudgetPeriod(containing: expense.date).key, default: 0] += expense.amountRappen
-        }
-
-        let firstKey = settings.map(\.periodKey).min() ?? current.key
-        var keys = Set(spentByPeriod.keys.filter { $0 <= current.key })
+        var keys = Set(ledger.spentByPeriod.keys.filter { $0 <= current.key })
         var period = current
-        var guardCount = 0
-        // Obergrenze nur als Schutz gegen eine Endlosschleife bei kaputten Daten.
-        while period.key >= firstKey && guardCount < 1200 {
+        let yearStart = current.firstOfBudgetYear()
+        while period >= yearStart && period.key >= firstKey {
             keys.insert(period.key)
             period = period.previous()
-            guardCount += 1
         }
 
         return keys.sorted(by: >).map { key in
             let period = BudgetPeriod(key: key)
-            let summary = BudgetMath.summary(
-                for: period,
-                amountRappen: BudgetMath.amount(for: period, in: settings) ?? 0,
-                spentRappen: spentByPeriod[key] ?? 0,
-                today: today
+            return HistoryRow(
+                period: period,
+                summary: ledger.summary(for: period, today: today),
+                isCurrent: key == current.key,
+                deficitAfter: key == current.key ? 0 : ledger.deficit(after: period),
+                isDeletable: period.budgetYear < current.budgetYear
             )
-            return HistoryRow(period: period, summary: summary, isCurrent: key == current.key)
         }
     }
+
+    private var deletableRows: [HistoryRow] { rows.filter(\.isDeletable) }
 
     var body: some View {
         List {
@@ -51,11 +60,69 @@ struct HistoryView: View {
                     HistoryRowView(row: row)
                 }
                 .listRowBackground(Theme.surface)
+                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    if row.isDeletable {
+                        Button(role: .destructive) {
+                            pendingDeletion = [row.period]
+                        } label: {
+                            Label("Lösche", systemImage: "trash")
+                        }
+                        .tint(Theme.negative)
+                    }
+                }
+            }
+
+            Section {
+                EmptyView()
+            } footer: {
+                Text("Lösche chasch nume Periode us früechere Jahr – so blybt es offes Defizit bis zum 24.12. geng sichtbar.")
             }
         }
         .listStyle(.insetGrouped)
         .themedList()
         .navigationTitle("Verlouf")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(role: .destructive) {
+                    pendingDeletion = deletableRows.map(\.period)
+                } label: {
+                    Label("Früecheri Jahr lösche", systemImage: "trash")
+                }
+                .tint(Theme.negative)
+                .disabled(deletableRows.isEmpty)
+            }
+        }
+        .confirmationDialog(
+            deletionTitle,
+            isPresented: Binding(
+                get: { !pendingDeletion.isEmpty },
+                set: { if !$0 { pendingDeletion = [] } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("Lösche", role: .destructive) {
+                BudgetRepository(context: context).deleteExpenses(in: pendingDeletion)
+                pendingDeletion = []
+            }
+            Button("Abbräche", role: .cancel) {
+                pendingDeletion = []
+            }
+        } message: {
+            Text("Das cha nid rückgängig gmacht wärde.")
+        }
+    }
+
+    private var deletionTitle: String {
+        let count = pendingDeletion.reduce(0) { $0 + expenseCount(in: $1) }
+        let bookings = count == 1 ? "1 Buechig" : "\(count) Buechige"
+        if pendingDeletion.count == 1, let period = pendingDeletion.first {
+            return "\(period.title()) lösche? (\(bookings))"
+        }
+        return "\(pendingDeletion.count) Periode lösche? (\(bookings))"
+    }
+
+    private func expenseCount(in period: BudgetPeriod) -> Int {
+        expenses.filter { period.contains($0.date) }.count
     }
 }
 
@@ -63,11 +130,20 @@ struct HistoryRow: Identifiable {
     let period: BudgetPeriod
     let summary: BudgetSummary
     let isCurrent: Bool
+    /// Offenes Defizit nach dieser Periode (0 für die laufende).
+    let deficitAfter: Int
+    /// Nur Perioden aus früheren Budgetjahren.
+    let isDeletable: Bool
     var id: Int { period.key }
 }
 
 private struct HistoryRowView: View {
     let row: HistoryRow
+
+    private var deficitText: String {
+        let amount = MoneyFormat.chf(row.deficitAfter)
+        return row.period.next().startsBudgetYear ? "Defizit \(amount) · am 25.12. zrüggsetzt" : "Defizit \(amount)"
+    }
 
     var body: some View {
         HStack(spacing: 12) {
@@ -77,6 +153,12 @@ private struct HistoryRowView: View {
                 Text(row.isCurrent ? "\(row.period.rangeText()) · louft no" : row.period.rangeText())
                     .font(.caption)
                     .foregroundStyle(Theme.textSecondary)
+                if row.deficitAfter > 0 {
+                    Text(deficitText)
+                        .font(.caption)
+                        .monospacedDigit()
+                        .foregroundStyle(Theme.negative)
+                }
             }
             Spacer(minLength: 8)
             ResultLabel(summary: row.summary, isCurrent: row.isCurrent)

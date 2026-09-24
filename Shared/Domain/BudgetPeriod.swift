@@ -70,6 +70,23 @@ struct BudgetPeriod: Hashable, Comparable, Identifiable {
         return BudgetPeriod(containing: dayBefore, calendar: calendar)
     }
 
+    // MARK: - Budgetjahr
+
+    /// Budgetjahr: von der Periode „Januar" (ab 25.12.) bis zur Periode „Dezember"
+    /// (bis 24.12.). Es ist das Jahr, in dem die Periode endet.
+    var budgetYear: Int {
+        let year = key / 100
+        return key % 100 == 12 ? year + 1 : year
+    }
+
+    /// Die Periode „Januar" (25.12.–24.01.): Hier beginnt das Defizit wieder bei 0.
+    var startsBudgetYear: Bool { key % 100 == 12 }
+
+    /// Die Periode „Januar" desselben Budgetjahrs.
+    func firstOfBudgetYear(calendar: Calendar = .current) -> BudgetPeriod {
+        BudgetPeriod(year: budgetYear - 1, month: 12, calendar: calendar)
+    }
+
     // MARK: - Tage
 
     func contains(_ date: Date) -> Bool {

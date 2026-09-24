@@ -77,6 +77,24 @@ struct BudgetRepository {
         save()
     }
 
+    /// Löscht alle Buchungen der angegebenen Perioden (Verlauf aufräumen, SPEC 4.4).
+    /// Liefert die Anzahl gelöschter Buchungen.
+    @discardableResult
+    func deleteExpenses(in periods: [BudgetPeriod]) -> Int {
+        var count = 0
+        for period in periods {
+            let start = period.start
+            let end = period.end
+            let descriptor = FetchDescriptor<Expense>(predicate: #Predicate<Expense> { $0.date >= start && $0.date < end })
+            for expense in (try? context.fetch(descriptor)) ?? [] {
+                context.delete(expense)
+                count += 1
+            }
+        }
+        save()
+        return count
+    }
+
     // MARK: - Kategorien
 
     func fallbackCategory() -> SpendingCategory? {

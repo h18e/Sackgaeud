@@ -70,6 +70,8 @@ private struct OverviewContent: View {
     @Environment(\.today) private var today
     @Query private var amounts: [BudgetAmount]
     @Query private var expenses: [Expense]
+    /// Frühere Perioden dieses Budgetjahrs – für das Defizit (SPEC 2.5).
+    @Query private var earlierExpenses: [Expense]
 
     init(period: BudgetPeriod, editorTarget: Binding<ExpenseEditorTarget?>) {
         self.period = period
@@ -80,6 +82,18 @@ private struct OverviewContent: View {
             filter: #Predicate<Expense> { $0.date >= start && $0.date < end },
             sort: [SortDescriptor(\Expense.date, order: .reverse), SortDescriptor(\Expense.createdAt, order: .reverse)]
         )
+        let yearStart = period.firstOfBudgetYear().start
+        _earlierExpenses = Query(filter: #Predicate<Expense> { $0.date >= yearStart && $0.date < start })
+    }
+
+    private var deficitStatus: DeficitStatus? {
+        let ledger = BudgetLedger(
+            settings: amounts.map(\.setting),
+            expenses: earlierExpenses.map { (date: $0.date, rappen: $0.amountRappen) }
+        )
+        let deficit = ledger.deficit(before: period)
+        guard deficit > 0 else { return nil }
+        return DeficitStatus(deficitRappen: deficit, summary: summary)
     }
 
     private var summary: BudgetSummary {
@@ -98,6 +112,13 @@ private struct OverviewContent: View {
                     .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
+
+                if let deficitStatus {
+                    DeficitCard(period: period, status: deficitStatus)
+                        .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 8, trailing: 16))
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
+                }
             }
 
             if expenses.isEmpty {
@@ -155,6 +176,48 @@ private struct RestCard: View {
             return "Überzoge um \(MoneyFormat.spoken(-summary.restRappen)), vo \(MoneyFormat.spoken(summary.amountRappen))"
         }
         return "No \(MoneyFormat.spoken(summary.restRappen)) übrig, vo \(MoneyFormat.spoken(summary.amountRappen))"
+    }
+}
+
+/// Offenes Defizit aus früheren Perioden, separat vom Restbetrag (SPEC 2.5).
+///
+/// Der Restbetrag oben bleibt die Zahl dieser Periode. Diese Karte zeigt zusätzlich,
+/// was es braucht, um das Defizit bis zum 24. auszugleichen.
+private struct DeficitCard: View {
+    let period: BudgetPeriod
+    let status: DeficitStatus
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 6) {
+                Image(systemName: "arrow.uturn.down.circle")
+                    .foregroundStyle(Theme.negative)
+                Text("Defizit us früechere Periode")
+                    .foregroundStyle(Theme.textSecondary)
+                Spacer(minLength: 8)
+                Text(MoneyFormat.chf(status.deficitRappen))
+                    .fontWeight(.semibold)
+                    .monospacedDigit()
+                    .foregroundStyle(Theme.negative)
+            }
+            .font(.subheadline)
+
+            Group {
+                if let daily = status.dailyWithCompensation {
+                    Text("Zum Uusglyche: höchschtens \(MoneyFormat.chf(daily)) pro Tag bis zum 24.")
+                } else if status.summary.remainingDays > 0 {
+                    Text("Die Periode reicht nid für e ganze Uusglych – o ohni wyteri Usgabe blybe \(MoneyFormat.chf(-status.spendableAfterCompensation)) offe.")
+                }
+                if period.next().startsBudgetYear {
+                    Text("Am 25.12. fangt ds Defizit wieder bi null a.")
+                }
+            }
+            .font(.footnote)
+            .foregroundStyle(Theme.textSecondary)
+            .monospacedDigit()
+        }
+        .card(padding: 14)
+        .accessibilityElement(children: .combine)
     }
 }
 

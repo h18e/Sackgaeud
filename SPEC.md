@@ -17,7 +17,7 @@ laufende Kosten.
 | Fixkosten / Einnahmen | **Nicht in der App.** Der Betrag in den Einstellungen ist bereits das, was nach den Fixkosten frei bleibt. |
 | Periode | **Fix vom 25. bis 24.** des Folgemonats, nicht einstellbar, keine Verschiebung bei Wochenenden. |
 | Startbetrag | **Ein fester Betrag** in den Einstellungen, gilt automatisch für jede Periode. |
-| Periodenende | **Jede Periode startet frisch.** Kein Übertrag von Rest oder Überzug; das Ergebnis steht in der Historie. |
+| Periodenende | **Jede Periode startet frisch** mit dem vollen Betrag. Ein Überzug wird als **Defizit separat** in die Folgeperioden mitgenommen und durch Einsparungen ausgeglichen; Rückstellung auf 0 mit der Periode „Januar" (SPEC 2.5). |
 | Erfassung | **Manuell.** Kein Bank-Import. |
 | Buchung | **Betrag, Kategorie, Datum** (Vorgabe heute). **Keine Notiz, keine Gutschriften.** |
 | Nutzer | **Nur Raphi.** iCloud-Sync zwischen den eigenen Geräten, kein Teilen. |
@@ -75,6 +75,24 @@ Diese Regeln liegen als reine Funktionen in der Domain-Schicht und bekommen Test
   (`CHF 1'234.55`, ganze Beträge als `CHF 40.–`).
 - Summen werden immer aus den ungerundeten Rappen gebildet und erst für die Anzeige
   gerundet.
+
+### 2.5 Defizit (Nachtrag 24.09.2026)
+
+- Der **Restbetrag bleibt die Zahl der laufenden Periode** und startet immer mit dem
+  vollen Betrag. Das Defizit steht **separat** darunter.
+- Offenes Defizit zu Beginn einer Periode = Defizit der Vorperiode **minus** deren
+  Ergebnis (Betrag − Ausgaben). Ein Überzug vergrössert es, was übrig bleibt,
+  verkleinert es. Es wird **nie negativ**: Ein Überschuss ohne offenes Defizit ist
+  kein Guthaben.
+- Beispiel: September −80 → Oktober startet mit 80. Oktober +50 → November 30.
+  November −20 → Dezember 50.
+- **Budgetjahr:** Periode „Januar" (ab 25.12.) bis Periode „Dezember" (bis 24.12.).
+  Mit der Periode „Januar" beginnt das Defizit wieder bei 0.
+- Anzeige in der laufenden Periode: „Zum Uusglyche: höchschtens CHF X pro Tag bis
+  zum 24." mit X = (Rest − Defizit) ÷ verbleibende Tage. Reicht die Periode nicht,
+  steht, wie viel auch ohne weitere Ausgaben offen bleibt. In der Periode „Dezember"
+  zusätzlich der Hinweis auf die Rückstellung am 25.12.
+- Das Widget zeigt das Defizit nicht.
 
 ---
 
@@ -162,6 +180,7 @@ Von oben nach unten:
 1. **Periodenname** und Zeitraum („Oktober 2026 · 25.09.–24.10.")
 2. **Restbetrag** – gross, eine Zahl. Darunter klein „vo CHF 1'500.–".
 3. **Tagesbudget** – „No CHF 42.– pro Tag für 18 Tag" bzw. „Überzoge um CHF 35.–".
+   Darunter, nur wenn eines offen ist, das **Defizit** (2.5).
 4. **Letzte Buchungen** der laufenden Periode, nach Tag gruppiert, neueste zuoberst:
    Symbol und Name der Kategorie, Betrag. Antippen → bearbeiten, nach links
    wischen → löschen (ohne Rückfrage, dafür mit einem kurzen „Rückgängig"-Hinweis).
@@ -185,13 +204,16 @@ Ziel: **unter 5 Sekunden** vom Antippen bis zum Sichern.
 
 ### 4.4 Historie
 
-- Liste aller Perioden **ab der Periode des Einstiegs** bis zur laufenden, neueste
-  zuoberst; ältere Perioden erscheinen zusätzlich, wenn rückdatierte Buchungen in
-  ihnen liegen.
+- Liste der Perioden, neueste zuoberst: das laufende Budgetjahr ab dem Einstieg
+  vollständig, frühere Jahre nur mit den Perioden, in denen Buchungen liegen.
 - Jede Zeile: Periodenname, Ergebnis („+ CHF 120.– übrig" grün mit Pfeil,
-  „− CHF 35.– überzoge" rot mit Pfeil).
+  „− CHF 35.– überzoge" rot mit Pfeil), darunter das Defizit nach dieser Periode.
+- **Löschen** (Nachtrag 24.09.2026): nur Perioden aus **früheren Budgetjahren**,
+  einzeln per Wischen oder alle zusammen („Früecheri Jahr lösche"). Gelöscht werden
+  alle Buchungen dieser Perioden, nach einer Rückfrage mit der Anzahl, ohne
+  Rückgängig. So bleibt ein offenes Defizit bis zum 24.12. immer vorhanden.
 - Antippen → Periodendetail:
-  - Betrag, Ausgaben, Ergebnis
+  - Betrag, Ausgaben, Ergebnis, Defizit vorher und nachher
   - **Balken je Kategorie**, absteigend nach Summe, mit Betrag und Anteil
   - alle Buchungen der Periode, bearbeitbar wie auf dem Hauptbildschirm
 
@@ -317,7 +339,7 @@ den Namen `Category` bereits belegt.
 | Mitteilungen (neue Periode, wenig Rest, Erinnerung) | v2 |
 | Trends über mehrere Perioden | v2 |
 | Notiz zur Buchung, Gutschriften | nicht vorgesehen |
-| Limiten je Kategorie, Übertrag, Fixkosten | nicht vorgesehen |
+| Limiten je Kategorie, Übertrag von Überschüssen, Fixkosten | nicht vorgesehen |
 | Teilen mit einer zweiten Person | nicht vorgesehen |
 
 ---
